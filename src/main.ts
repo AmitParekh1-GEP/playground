@@ -1,5 +1,6 @@
 import "./styles.scss";
-import { inject, Injectable, Injector } from "./app/core";
+import { Component, inject, Injectable } from "./app/core";
+import { OnInit } from "./app/core/typings";
 
 @Injectable()
 class DataService {
@@ -18,16 +19,40 @@ class HttpClient {
     }
 }
 
-class AppComponent extends HTMLElement {
-    http = inject(HttpClient);
-
-    connectedCallback() {
-        this.http.get('https://api.example.com/data');
-        this.innerHTML = `
-            <h1>Hello, World!</h1>
-            <p>Welcome to your first web component!</p>
-        `;
+@Injectable()
+class HttpClientTest {
+    dataService = inject(DataService);
+    
+    get(url: string) {
+        return this.dataService.get('https://api.test.com/data');
     }
 }
 
-customElements.define('app-root', AppComponent);
+@Component({
+    selector: "app-header",
+    template: `<p>Header component!</p>`,
+    providers: [
+        { provide: HttpClient, useClass: HttpClientTest }
+    ]
+})
+class HeaderComponent implements OnInit {
+    http = inject(HttpClient);
+
+    onInit(): void {
+        this.http.get("");
+    }
+}
+
+@Component({
+    selector: 'app-root',
+    template: `
+        <app-header></app-header>
+        <h1>Hello, World!</h1>
+        <p>Welcome to your first web component!</p>
+    `,
+    providers: [HttpClient, DataService],
+    imports: [HeaderComponent]
+})
+class AppComponent implements OnInit {
+    onInit(): void {}
+}

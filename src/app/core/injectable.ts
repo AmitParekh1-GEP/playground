@@ -1,17 +1,5 @@
-import { Injector } from "./injector";
-
-export function Injectable(options?: InjectableOptions) {
+export function Injectable() {
   return function (target: any) {
-    target.ɵprov = {
-      // token: target,
-      providedIn: options?.providedIn || 'root',
-      // factory: () => new target(),
-    };
-    Injector.getInstance().register(target);
+    target.ɵprov = true;
   };
 };
-
-interface InjectableOptions {
-    providedIn?: 'root';
-    deps?: any[];
-}
