@@ -1,6 +1,6 @@
 import "./styles.scss";
-import { Component, inject, Injectable } from "./app/core";
-import { OnInit } from "./app/core/typings";
+import { Component, inject, Injectable, Input } from "./libs/core";
+import { AfterViewInit, ElementRef, OnChanges, OnInit, SimpleChange } from "./libs/core/typings";
 
 @Injectable()
 class DataService {
@@ -32,23 +32,35 @@ class HttpClientTest {
     selector: "app-button",
     template: `<button type="button">Login</button>`
 })
-class ButtonComponent implements OnInit {
+class ButtonComponent implements OnInit, OnChanges {
     http = inject(HttpClient);
+
+    @Input() type: string = "hello";
+    @Input() content: string = "hello";
 
     onInit(): void {
         this.http.get("");
+    }
+
+    onChanges(changes: SimpleChange): void {
+        console.log(changes);
     }
 }
 
 @Component({
     selector: "app-header",
-    template: `<p>Header component! <app-button></app-button></p>`,
+    template: `<p>Header component! <app-button type="button" content="hello"></app-button></p>`,
     providers: [
         { provide: HttpClient, useClass: HttpClientTest }
-    ]
+    ],
+    imports: [ButtonComponent]
 })
-class HeaderComponent implements OnInit {
+class HeaderComponent implements OnInit, AfterViewInit {
     onInit(): void {}
+
+    afterViewInit(el: ElementRef): void {
+        document.querySelector('app-button')?.setAttribute('type', 'link');
+    }
 }
 
 @Component({
@@ -71,7 +83,8 @@ class LeftNavComponent implements OnInit {
         <p>Welcome to your first web component!</p>
         <app-left-nav></app-left-nav>
     `,
-    providers: [HttpClient, DataService]
+    providers: [HttpClient, DataService],
+    imports: [HeaderComponent, LeftNavComponent]
 })
 class AppComponent implements OnInit {
     onInit(): void {}
