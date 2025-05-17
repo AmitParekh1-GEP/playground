@@ -1,6 +1,9 @@
+import "./normalize.scss";
+import "./theme.scss";
 import "./styles.scss";
+import styles from "./app/app.component.scss";
 import { Component, inject, Injectable, Input } from "./libs/core";
-import { AfterViewInit, ElementRef, OnChanges, OnInit, SimpleChange } from "./libs/core/typings";
+import { CustomElement, ElementRef, SimpleChange } from "./libs/core/typings";
 
 @Injectable()
 class DataService {
@@ -29,16 +32,20 @@ class HttpClientTest {
 }
 
 @Component({
-    selector: "app-button",
-    template: `<button type="button">Login</button>`
+    selector: "app-button"
 })
-class ButtonComponent implements OnInit, OnChanges {
+class ButtonComponent implements CustomElement {
     http = inject(HttpClient);
 
     @Input() type: string = "hello";
     @Input() content: string = "hello";
 
+    render(): string {
+        return /* html */`<button type="button">${this.content}</button>`;
+    }
+
     onInit(): void {
+        console.log(this.type, this.content);
         this.http.get("");
     }
 
@@ -49,26 +56,46 @@ class ButtonComponent implements OnInit, OnChanges {
 
 @Component({
     selector: "app-header",
-    template: `<p>Header component! <app-button type="button" content="hello"></app-button></p>`,
     providers: [
         { provide: HttpClient, useClass: HttpClientTest }
     ],
     imports: [ButtonComponent]
 })
-class HeaderComponent implements OnInit, AfterViewInit {
-    onInit(): void {}
+class HeaderComponent implements CustomElement {
+    onInit(): void {
+        console.log(this.render());
+    }
+
+    content = {
+        logo: "Hello world",
+        menuButtons: ["Home", "About", "Contact"],
+        navButtons: ["Login", "Search"]
+    };
+
+    hello = "world";
+
+    
+    render(): string {
+        const buttonTemplate = (button: string) => /* html */`<app-button type="button" content="${button}"></app-button>`;
+        return /* html */`<p>Header Component!</p> <p>${this.hello}</p> ${
+            this.content.navButtons.reduce((result, button) => result + buttonTemplate(button), "")
+        }`;
+    }
 
     afterViewInit(el: ElementRef): void {
-        document.querySelector('app-button')?.setAttribute('type', 'link');
+        el.querySelector('app-button')?.setAttribute('type', 'link');
     }
 }
 
 @Component({
-    selector: "app-left-nav",
-    template: `<p>LeftNav component!</p>`,
+    selector: "app-left-nav"
 })
-class LeftNavComponent implements OnInit {
+class LeftNavComponent implements CustomElement {
     http = inject(HttpClient);
+
+    render(): string {
+        return /* html */`<p>LeftNav component!</p>`;
+    }
 
     onInit(): void {
         this.http.get("");
@@ -77,15 +104,19 @@ class LeftNavComponent implements OnInit {
 
 @Component({
     selector: 'app-root',
-    template: `
-        <app-header></app-header>
-        <h1>Hello, World!</h1>
-        <p>Welcome to your first web component!</p>
-        <app-left-nav></app-left-nav>
-    `,
     providers: [HttpClient, DataService],
     imports: [HeaderComponent, LeftNavComponent]
 })
-class AppComponent implements OnInit {
+export class AppComponent implements CustomElement {
     onInit(): void {}
+
+    render(): string {
+        console.log(styles)
+        return /* html */`
+            <app-header></app-header>
+            <h1 class="${styles.title}">Hello, World!</h1>
+            <p class="${styles.header}">Welcome to your first web component!</p>
+            <app-left-nav></app-left-nav>
+        `;
+    }
 }

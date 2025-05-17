@@ -1,0 +1,15 @@
+:host {
+    // Naming convention to name design token
+
+    // --<design_attribute>-<ui_element>-<token_purpose>-<interaction_state>
+    
+    // design_attribute = color | font | space | opacity | elevation
+    // ui_element = text | background | surface | shadow | border | heading
+    // token_purpose = info | warning | danger | success | ... | <value>
+    // interaction_state = hovered | focused
+    
+    // https://atlassian.design/components/tokens/all-tokens
+
+    // add theme variables here
+    --color-text-primary: #3373C4;
+}
