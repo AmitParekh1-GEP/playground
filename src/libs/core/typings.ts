@@ -5,10 +5,13 @@ export type Provider = ClassProvider | ValueProvider;
 export type ClassProvider = Type | { provide: Type; useClass: Type };
 export type ValueProvider = { provide: Type; useValue: any };
 
-export interface OnInit { onInit(): void; }
-export interface AfterViewInit { afterViewInit(el: ElementRef): void; }
-export interface OnChanges { onChanges(changes: SimpleChange): void; }
-export interface OnDestroy { onDestroy(): void; }
+export interface CustomElement {
+    render(): string;
+    onInit?(): void;
+    afterViewInit?(el: ElementRef): void;
+    onChanges?(changes: SimpleChange): void;
+    onDestroy?(): void;
+}
 
 export interface SimpleChange {
     [key: string]: { oldValue: any, newValue: any };
