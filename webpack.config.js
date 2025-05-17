@@ -24,7 +24,24 @@ module.exports = {
                 exclude: /node_modules/,
             },
             {
-                test: /\.s[ac]ss$/i,
+                test: /\.component\.scss$/, // Only treat *.component.scss as CSS Modules
+                use: [
+                  'style-loader', // Injects styles into DOM
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      modules: {
+                        namedExport: false,
+                        localIdentName: '[name]__[local]' // Generates unique class names
+                      }
+                    }
+                  },
+                  'sass-loader' // Compiles SCSS to CSS
+                ]
+            },        
+            {
+                test: /\.s[ac]ss$/i,    // Fallback for global SCSS
+                exclude: /\.component\.scss$/,
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader', 
